@@ -181,10 +181,12 @@ class HaierDeviceGateway:
         # 设备在线/离线监听
         if msg['content']['businType'] in ('DevOfflineNotify', 'DevOnlineNotify'):
             for device_id in data['devs']:
+                online = msg['content']['businType'] == 'DevOnlineNotify'
                 fire_event(self._hass, EVENT_DEVICE_ONLINE_CHANGED, {
                     'deviceId': device_id,
-                    'online': msg['content']['businType'] == 'DevOnlineNotify'
+                    'online': online
                 })
+                _LOGGER.info('Device %s is %s', device_id, 'Online' if online else 'Offline')
             return
 
         _LOGGER.debug('Received websocket data: ' + json.dumps(msg))
