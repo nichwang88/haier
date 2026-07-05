@@ -136,11 +136,14 @@ class HaierClient:
             content = await response.json(content_type=None)
 
             if 'error' in content:
-                raise HaierClientException('Password login failed: {}'.format(content['error']))
+                reason = content.get('error_description') or content.get('retInfo') or content['error']
+                raise HaierClientException('Password login failed: {}'.format(reason))
 
             token = content.get('uhome_access_token')
             if not token:
-                raise HaierClientException('Password login failed: uhome_access_token missing')
+                raise HaierClientException('Password login failed: uhome_access_token missing, response: {}'.format(
+                    json.dumps(content, ensure_ascii=False)
+                ))
 
             return TokenInfo(token, '', 9 * 24 * 60 * 60)
 

@@ -1,7 +1,8 @@
 {
     "config": {
         "error": {
-            "auth_error": "认证失败"
+            "auth_error": "认证失败",
+            "auth_error_reason": "认证失败：{reason}"
         },
         "step": {
             "user": {
@@ -33,7 +34,8 @@
     },
     "options": {
         "error": {
-            "auth_error": "认证失败"
+            "auth_error": "认证失败",
+            "auth_error_reason": "认证失败：{reason}"
         },
         "step": {
             "init": {

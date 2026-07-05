@@ -1,7 +1,8 @@
 {
     "config": {
         "error": {
-            "auth_error": "Authentication failed"
+            "auth_error": "Authentication failed",
+            "auth_error_reason": "Authentication failed: {reason}"
         },
         "step": {
             "user": {
@@ -33,7 +34,8 @@
     },
     "options": {
         "error": {
-            "auth_error": "Authentication failed"
+            "auth_error": "Authentication failed",
+            "auth_error_reason": "Authentication failed: {reason}"
         },
         "step": {
             "init": {

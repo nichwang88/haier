@@ -49,6 +49,7 @@ class HaierConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_token(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         errors: Dict[str, str] = {}
+        error_reason = ''
         if user_input is not None:
             try:
                 # 根据refresh_token获取token
@@ -70,7 +71,8 @@ class HaierConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 })
             except HaierClientException as e:
                 _LOGGER.warning(str(e))
-                errors['base'] = 'auth_error'
+                error_reason = str(e)
+                errors['base'] = 'auth_error_reason'
 
         return self.async_show_form(
             step_id="token",
@@ -81,11 +83,13 @@ class HaierConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required('default_load_all_entity', default=True): bool,
                 }
             ),
-            errors=errors
+            errors=errors,
+            description_placeholders={'reason': error_reason}
         )
 
     async def async_step_password(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         errors: Dict[str, str] = {}
+        error_reason = ''
         if user_input is not None:
             try:
                 client = HaierClient.legacy(self.hass, '')
@@ -109,7 +113,8 @@ class HaierConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 })
             except HaierClientException as e:
                 _LOGGER.warning(str(e))
-                errors['base'] = 'auth_error'
+                error_reason = str(e)
+                errors['base'] = 'auth_error_reason'
 
         return self.async_show_form(
             step_id="password",
@@ -120,7 +125,8 @@ class HaierConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required('default_load_all_entity', default=True): bool,
                 }
             ),
-            errors=errors
+            errors=errors,
+            description_placeholders={'reason': error_reason}
         )
 
     @staticmethod
@@ -168,6 +174,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
     async def async_step_account_token(self,  user_input: dict[str, Any] | None = None) -> FlowResult:
         errors: Dict[str, str] = {}
+        error_reason = ''
 
         cfg = AccountConfig(self.hass, self.config_entry)
 
@@ -193,7 +200,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 return self.async_create_entry(title='', data={})
             except HaierClientException as e:
                 _LOGGER.warning(str(e))
-                errors['base'] = 'auth_error'
+                error_reason = str(e)
+                errors['base'] = 'auth_error_reason'
 
         return self.async_show_form(
             step_id="account_token",
@@ -204,11 +212,13 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     vol.Required('default_load_all_entity', default=cfg.default_load_all_entity): bool,
                 }
             ),
-            errors=errors
+            errors=errors,
+            description_placeholders={'reason': error_reason}
         )
 
     async def async_step_account_password(self,  user_input: dict[str, Any] | None = None) -> FlowResult:
         errors: Dict[str, str] = {}
+        error_reason = ''
 
         cfg = AccountConfig(self.hass, self.config_entry)
 
@@ -236,7 +246,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 return self.async_create_entry(title='', data={})
             except HaierClientException as e:
                 _LOGGER.warning(str(e))
-                errors['base'] = 'auth_error'
+                error_reason = str(e)
+                errors['base'] = 'auth_error_reason'
 
         return self.async_show_form(
             step_id="account_password",
@@ -247,7 +258,8 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     vol.Required('default_load_all_entity', default=cfg.default_load_all_entity): bool,
                 }
             ),
-            errors=errors
+            errors=errors,
+            description_placeholders={'reason': error_reason}
         )
 
     async def async_step_device(self,  user_input: dict[str, Any] | None = None) -> FlowResult:
