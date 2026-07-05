@@ -6,11 +6,27 @@
         "step": {
             "user": {
                 "data": {
+                    "auth_method": "Authentication method"
+                },
+                "description": "Select how to sign in to Haier.",
+                "title": "Configure account information"
+            },
+            "token": {
+                "data": {
                     "client_id": "Client Id",
                     "refresh_token": "Refresh Token",
                     "default_load_all_entity": "Default load all entity"
                 },
-                "description": "Enter your Haier Token.",
+                "description": "Enter the Client Id and Refresh Token captured from Haier Smart Home.",
+                "title": "Configure account information"
+            },
+            "password": {
+                "data": {
+                    "username": "Username",
+                    "password": "Password",
+                    "default_load_all_entity": "Default load all entity"
+                },
+                "description": "Experimental legacy password login. If Haier rejects this flow, use Client Id + Refresh Token.",
                 "title": "Configure account information"
             }
         }
@@ -30,8 +46,22 @@
             "account": {
                 "title": "Account information",
                 "data": {
+                    "auth_method": "Authentication method"
+                }
+            },
+            "account_token": {
+                "title": "Account information",
+                "data": {
                     "client_id": "Client Id",
                     "refresh_token": "Refresh Token",
+                    "default_load_all_entity": "Default load all entity"
+                }
+            },
+            "account_password": {
+                "title": "Account information",
+                "data": {
+                    "username": "Username",
+                    "password": "Password",
                     "default_load_all_entity": "Default load all entity"
                 }
             },

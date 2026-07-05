@@ -8,8 +8,8 @@ from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.event import async_track_time_interval
 
 from .const import DOMAIN, SUPPORTED_PLATFORMS, FILTER_TYPE_EXCLUDE, FILTER_TYPE_INCLUDE
-from .core.client import HaierClient, HaierClientException, TokenInfo
-from .core.config import AccountConfig, DeviceFilterConfig, EntityFilterConfig
+from .core.client import HaierClient, HaierClientException, LEGACY_CLIENT_ID, TokenInfo
+from .core.config import AccountConfig, AUTH_METHOD_PASSWORD, DeviceFilterConfig, EntityFilterConfig
 from .core.device_gateway import HaierDeviceGateway
 
 _LOGGER = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data[DOMAIN]['cancel_token_updater'] = await token_updater(hass, entry)
 
     account_cfg = AccountConfig(hass, entry)
-    client = HaierClient(hass, account_cfg.client_id, account_cfg.token)
+    client = HaierClient(hass, account_cfg.client_id, account_cfg.token, account_cfg.app_id, account_cfg.app_key)
 
     devices = await client.get_devices()
     _LOGGER.info('共获取到{}个设备'.format(len(devices)))
@@ -59,11 +59,14 @@ async def token_updater(hass: HomeAssistant, entry: ConfigEntry):
         _LOGGER.debug("try update token...")
 
         cfg = AccountConfig(hass, entry)
-        client = HaierClient(hass, cfg.client_id, cfg.token)
+        client = HaierClient(hass, cfg.client_id, cfg.token, cfg.app_id, cfg.app_key)
 
         token_valid = True
         try:
-            await client.get_user_info()
+            if cfg.auth_method == AUTH_METHOD_PASSWORD:
+                await client.validate_devices_access()
+            else:
+                await client.get_user_info()
         except HaierClientException:
             token_valid = False
 
@@ -71,7 +74,12 @@ async def token_updater(hass: HomeAssistant, entry: ConfigEntry):
         if token_valid and cfg.expires_at - int(time.time()) > 86400:
             return False
 
-        token_info = await client.refresh_token(cfg.refresh_token)
+        if cfg.auth_method == AUTH_METHOD_PASSWORD:
+            token_info = await client.login_with_password(cfg.username, cfg.password)
+            cfg.client_id = LEGACY_CLIENT_ID
+        else:
+            token_info = await client.refresh_token(cfg.refresh_token)
+
         cfg.token = token_info.token
         cfg.refresh_token = token_info.refresh_token
         cfg.expires_at = int(time.time()) + token_info.expires_in

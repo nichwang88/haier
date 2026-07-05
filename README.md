@@ -25,6 +25,16 @@
 
 或者点击: [![添加集成](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start?domain=haier)
 
+### nichwang88 Fork
+
+本 fork 在原有 `Client Id + Refresh Token` 配置方式之外，增加了实验性的“账号密码”登录方式。该方式来自本项目早期 `v0.1.x` 使用过的海尔智家旧 OAuth 密码登录链路，若海尔服务器拒绝该接口，请继续使用原有抓包方式。
+
+HACS 自定义仓库地址：
+
+```text
+https://github.com/nichwang88/haier
+```
+
 
 ## 常见问题
 

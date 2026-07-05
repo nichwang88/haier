@@ -5,6 +5,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from custom_components.haier.const import FILTER_TYPE_EXCLUDE, FILTER_TYPE_INCLUDE
+from custom_components.haier.core.client import APP_ID, APP_KEY, LEGACY_APP_ID, LEGACY_APP_KEY, LEGACY_CLIENT_ID
+
+AUTH_METHOD_TOKEN = 'token'
+AUTH_METHOD_PASSWORD = 'password'
 
 
 class AccountConfig:
@@ -22,30 +26,56 @@ class AccountConfig:
 
     default_load_all_entity: bool = None
 
+    auth_method: str = None
+
+    username: str = None
+
+    password: str = None
+
+    app_id: str = None
+
+    app_key: str = None
+
     def __init__(self, hass: HomeAssistant, config: ConfigEntry):
         self._hass = hass
         self._config = config
 
         cfg = config.data.get('account', {})
+        self.auth_method = cfg.get('auth_method', AUTH_METHOD_TOKEN)
         self.client_id = cfg.get('client_id', '')
         self.token = cfg.get('token', '')
         self.refresh_token = cfg.get('refresh_token', '')
         self.expires_at = cfg.get('expires_at', 0)
         self.default_load_all_entity = cfg.get('default_load_all_entity', True)
+        self.username = cfg.get('username', '')
+        self.password = cfg.get('password', '')
+        self.app_id = cfg.get('app_id', LEGACY_APP_ID if self.auth_method == AUTH_METHOD_PASSWORD else APP_ID)
+        self.app_key = cfg.get('app_key', LEGACY_APP_KEY if self.auth_method == AUTH_METHOD_PASSWORD else APP_KEY)
 
     def save(self, mobile: str = None):
+        account = {
+            'auth_method': self.auth_method,
+            'client_id': self.client_id,
+            'token': self.token,
+            'refresh_token': self.refresh_token,
+            'expires_at': self.expires_at,
+            'default_load_all_entity': self.default_load_all_entity,
+            'app_id': self.app_id,
+            'app_key': self.app_key
+        }
+        if self.auth_method == AUTH_METHOD_PASSWORD:
+            account.update({
+                'client_id': LEGACY_CLIENT_ID,
+                'username': self.username,
+                'password': self.password
+            })
+
         self._hass.config_entries.async_update_entry(
             self._config,
             title='Haier: {}'.format(mobile) if mobile else self._config.title,
             data={
                 **self._config.data,
-                'account': {
-                    'client_id': self.client_id,
-                    'token': self.token,
-                    'refresh_token': self.refresh_token,
-                    'expires_at': self.expires_at,
-                    'default_load_all_entity': self.default_load_all_entity
-                }
+                'account': account
             }
         )
 

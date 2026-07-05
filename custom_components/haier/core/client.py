@@ -19,7 +19,13 @@ _LOGGER = logging.getLogger(__name__)
 
 APP_ID = 'MB-SHEZJAPPWXXCX-0000'
 APP_KEY = '79ce99cc7f9804663939676031b8a427'
+LEGACY_APP_ID = 'MB-SYJCSGJYY-0000'
+LEGACY_APP_KEY = '64ad7e690287d740f6ed00924264e3d9'
+LEGACY_CLIENT_ID = '956877020056553-08002700DC94'
+LEGACY_OAUTH_CLIENT_ID = 'upluszhushou'
+LEGACY_OAUTH_CLIENT_SECRET = 'eZOQScs1pjXyzs'
 
+PASSWORD_TOKEN_API = 'https://account-api.haier.net/oauth/token'
 REFRESH_TOKEN_API = 'https://zj.haier.net/api-gw/oauthserver/account/v1/refreshToken'
 GET_USER_INFO_API = 'https://account-api.haier.net/v2/haier/userinfo'
 GET_DEVICES_API = 'https://uws.haier.net/uds/v1/protected/deviceinfos'
@@ -90,11 +96,53 @@ class HaierClientException(Exception):
 
 class HaierClient:
 
-    def __init__(self, hass: HomeAssistant, client_id: str, token: str):
+    def __init__(self, hass: HomeAssistant, client_id: str, token: str, app_id: str = APP_ID, app_key: str = APP_KEY):
         self._client_id = client_id
         self._token = token
+        self._app_id = app_id
+        self._app_key = app_key
         self._hass = hass
         self._session = async_get_clientsession(hass)
+
+    @classmethod
+    def legacy(cls, hass: HomeAssistant, token: str):
+        return cls(hass, LEGACY_CLIENT_ID, token, LEGACY_APP_ID, LEGACY_APP_KEY)
+
+    @retry_on_exception(exceptions=(aiohttp.ClientError, asyncio.TimeoutError))
+    async def login_with_password(self, username: str, password: str) -> TokenInfo:
+        """
+        使用早期海尔智家 OAuth 密码模式登录。
+
+        这是 v0.1.x 曾使用过的旧登录链路。海尔侧可能随时限制该接口，
+        因此配置流会用设备接口再校验一次 token 是否可用。
+        """
+        uhome_sign = hashlib.sha256(
+            (LEGACY_APP_ID + LEGACY_APP_KEY + LEGACY_CLIENT_ID).encode('utf-8')
+        ).hexdigest()
+        data = {
+            'client_id': LEGACY_OAUTH_CLIENT_ID,
+            'client_secret': LEGACY_OAUTH_CLIENT_SECRET,
+            'grant_type': 'password',
+            'connection': 'basic_password',
+            'username': username,
+            'password': password,
+            'type_uhome': 'type_uhome_common_token',
+            'uhome_client_id': LEGACY_CLIENT_ID,
+            'uhome_app_id': LEGACY_APP_ID,
+            'uhome_sign': uhome_sign
+        }
+
+        async with self._session.post(url=PASSWORD_TOKEN_API, data=data) as response:
+            content = await response.json(content_type=None)
+
+            if 'error' in content:
+                raise HaierClientException('Password login failed: {}'.format(content['error']))
+
+            token = content.get('uhome_access_token')
+            if not token:
+                raise HaierClientException('Password login failed: uhome_access_token missing')
+
+            return TokenInfo(token, '', 9 * 24 * 60 * 60)
 
     @retry_on_exception(exceptions=(aiohttp.ClientError, asyncio.TimeoutError))
     async def refresh_token(self, refresh_token: str) -> TokenInfo:
@@ -137,6 +185,14 @@ class HaierClient:
                 'mobile': content['mobile'],
                 'username': content['username']
             }
+
+    @retry_on_exception(exceptions=(aiohttp.ClientError, asyncio.TimeoutError))
+    async def validate_devices_access(self) -> int:
+        headers = await self._generate_common_headers(GET_DEVICES_API)
+        async with self._session.get(url=GET_DEVICES_API, headers=headers) as response:
+            content = await response.json(content_type=None)
+            self._assert_response_successful(content)
+            return len(content.get('deviceinfos', []))
 
     @retry_on_exception(exceptions=(aiohttp.ClientError, asyncio.TimeoutError))
     async def get_devices(self) -> List[HaierDevice]:
@@ -291,11 +347,11 @@ class HaierClient:
 
         return {
             'accessToken': self._token,
-            'appId': APP_ID,
-            'appKey': APP_KEY,
+            'appId': self._app_id,
+            'appKey': self._app_key,
             'clientId': self._client_id,
             'sequenceId': sequence_id,
-            'sign': self._sign(APP_ID, APP_KEY, timestamp, body, api),
+            'sign': self._sign(self._app_id, self._app_key, timestamp, body, api),
             'timestamp': timestamp,
             'timezone': '+8',
             'language': 'zh-CN'
