@@ -24,6 +24,7 @@ _LOGGER = logging.getLogger(__name__)
 CLIENT_ID = 'client_id'
 REFRESH_TOKEN = 'refresh_token'
 AUTH_METHOD = 'auth_method'
+NO_ERROR_REASON = '-'
 AUTH_METHODS = {
     AUTH_METHOD_TOKEN: 'Client Id + Refresh Token',
     AUTH_METHOD_PASSWORD: '账号密码（实验性）',
@@ -72,7 +73,7 @@ class HaierConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except HaierClientException as e:
                 _LOGGER.warning(str(e))
                 error_reason = str(e)
-                errors['base'] = 'auth_error_reason'
+                errors['base'] = 'auth_error'
 
         return self.async_show_form(
             step_id="token",
@@ -84,7 +85,7 @@ class HaierConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 }
             ),
             errors=errors,
-            description_placeholders={'reason': error_reason}
+            description_placeholders={'reason': error_reason or NO_ERROR_REASON}
         )
 
     async def async_step_password(self, user_input: dict[str, Any] | None = None) -> FlowResult:
@@ -114,7 +115,7 @@ class HaierConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except HaierClientException as e:
                 _LOGGER.warning(str(e))
                 error_reason = str(e)
-                errors['base'] = 'auth_error_reason'
+                errors['base'] = 'auth_error'
 
         return self.async_show_form(
             step_id="password",
@@ -126,7 +127,7 @@ class HaierConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 }
             ),
             errors=errors,
-            description_placeholders={'reason': error_reason}
+            description_placeholders={'reason': error_reason or NO_ERROR_REASON}
         )
 
     @staticmethod
@@ -201,7 +202,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             except HaierClientException as e:
                 _LOGGER.warning(str(e))
                 error_reason = str(e)
-                errors['base'] = 'auth_error_reason'
+                errors['base'] = 'auth_error'
 
         return self.async_show_form(
             step_id="account_token",
@@ -213,7 +214,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 }
             ),
             errors=errors,
-            description_placeholders={'reason': error_reason}
+            description_placeholders={'reason': error_reason or NO_ERROR_REASON}
         )
 
     async def async_step_account_password(self,  user_input: dict[str, Any] | None = None) -> FlowResult:
@@ -247,7 +248,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             except HaierClientException as e:
                 _LOGGER.warning(str(e))
                 error_reason = str(e)
-                errors['base'] = 'auth_error_reason'
+                errors['base'] = 'auth_error'
 
         return self.async_show_form(
             step_id="account_password",
@@ -259,7 +260,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 }
             ),
             errors=errors,
-            description_placeholders={'reason': error_reason}
+            description_placeholders={'reason': error_reason or NO_ERROR_REASON}
         )
 
     async def async_step_device(self,  user_input: dict[str, Any] | None = None) -> FlowResult:

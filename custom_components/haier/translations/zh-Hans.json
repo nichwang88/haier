@@ -14,7 +14,7 @@
             },
             "token": {
                 "title": "账号设置",
-                "description": "使用抓包得到的 Client Id 和 Refresh Token",
+                "description": "使用抓包得到的 Client Id 和 Refresh Token。\n\n最近失败原因：{reason}",
                 "data": {
                     "client_id": "Client Id",
                     "refresh_token": "Refresh Token",
@@ -23,7 +23,7 @@
             },
             "password": {
                 "title": "账号设置",
-                "description": "实验性旧版账号密码登录。如果海尔接口拒绝，请继续使用 Client Id + Refresh Token。",
+                "description": "实验性旧版账号密码登录。如果海尔接口拒绝，请继续使用 Client Id + Refresh Token。\n\n最近失败原因：{reason}",
                 "data": {
                     "username": "账号",
                     "password": "密码",
@@ -53,6 +53,7 @@
             },
             "account_token": {
                 "title": "账号设置",
+                "description": "使用抓包得到的 Client Id 和 Refresh Token。\n\n最近失败原因：{reason}",
                 "data": {
                     "client_id": "Client Id",
                     "refresh_token": "Refresh Token",
@@ -61,6 +62,7 @@
             },
             "account_password": {
                 "title": "账号设置",
+                "description": "实验性旧版账号密码登录。如果海尔接口拒绝，请继续使用 Client Id + Refresh Token。\n\n最近失败原因：{reason}",
                 "data": {
                     "username": "账号",
                     "password": "密码",
