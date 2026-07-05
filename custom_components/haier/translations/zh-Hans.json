@@ -18,7 +18,8 @@
                 "data": {
                     "client_id": "Client Id",
                     "refresh_token": "Refresh Token",
-                    "default_load_all_entity": "默认加载所有实体"
+                    "default_load_all_entity": "默认加载所有实体",
+                    "last_failure_reason": "最近失败原因"
                 }
             },
             "password": {
@@ -27,7 +28,8 @@
                 "data": {
                     "username": "账号",
                     "password": "密码",
-                    "default_load_all_entity": "默认加载所有实体"
+                    "default_load_all_entity": "默认加载所有实体",
+                    "last_failure_reason": "最近失败原因"
                 }
             }
         }
@@ -57,7 +59,8 @@
                 "data": {
                     "client_id": "Client Id",
                     "refresh_token": "Refresh Token",
-                    "default_load_all_entity": "默认加载所有实体"
+                    "default_load_all_entity": "默认加载所有实体",
+                    "last_failure_reason": "最近失败原因"
                 }
             },
             "account_password": {
@@ -66,7 +69,8 @@
                 "data": {
                     "username": "账号",
                     "password": "密码",
-                    "default_load_all_entity": "默认加载所有实体"
+                    "default_load_all_entity": "默认加载所有实体",
+                    "last_failure_reason": "最近失败原因"
                 }
             },
             "device": {

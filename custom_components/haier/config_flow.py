@@ -25,6 +25,7 @@ CLIENT_ID = 'client_id'
 REFRESH_TOKEN = 'refresh_token'
 AUTH_METHOD = 'auth_method'
 NO_ERROR_REASON = '-'
+LAST_FAILURE_REASON = 'last_failure_reason'
 AUTH_METHODS = {
     AUTH_METHOD_TOKEN: 'Client Id + Refresh Token',
     AUTH_METHOD_PASSWORD: '账号密码（实验性）',
@@ -82,6 +83,10 @@ class HaierConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CLIENT_ID): str,
                     vol.Required(REFRESH_TOKEN): str,
                     vol.Required('default_load_all_entity', default=True): bool,
+                    **(
+                        {vol.Optional(LAST_FAILURE_REASON, default=error_reason): str}
+                        if error_reason else {}
+                    ),
                 }
             ),
             errors=errors,
@@ -124,6 +129,10 @@ class HaierConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_USERNAME): str,
                     vol.Required(CONF_PASSWORD): str,
                     vol.Required('default_load_all_entity', default=True): bool,
+                    **(
+                        {vol.Optional(LAST_FAILURE_REASON, default=error_reason): str}
+                        if error_reason else {}
+                    ),
                 }
             ),
             errors=errors,
@@ -211,6 +220,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     vol.Required(CLIENT_ID, default=cfg.client_id): str,
                     vol.Required(REFRESH_TOKEN, default=cfg.refresh_token): str,
                     vol.Required('default_load_all_entity', default=cfg.default_load_all_entity): bool,
+                    **(
+                        {vol.Optional(LAST_FAILURE_REASON, default=error_reason): str}
+                        if error_reason else {}
+                    ),
                 }
             ),
             errors=errors,
@@ -257,6 +270,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     vol.Required(CONF_USERNAME, default=cfg.username): str,
                     vol.Required(CONF_PASSWORD, default=cfg.password): str,
                     vol.Required('default_load_all_entity', default=cfg.default_load_all_entity): bool,
+                    **(
+                        {vol.Optional(LAST_FAILURE_REASON, default=error_reason): str}
+                        if error_reason else {}
+                    ),
                 }
             ),
             errors=errors,

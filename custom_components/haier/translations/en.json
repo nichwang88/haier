@@ -16,7 +16,8 @@
                 "data": {
                     "client_id": "Client Id",
                     "refresh_token": "Refresh Token",
-                    "default_load_all_entity": "Default load all entity"
+                    "default_load_all_entity": "Default load all entity",
+                    "last_failure_reason": "Last failure reason"
                 },
                 "description": "Enter the Client Id and Refresh Token captured from Haier Smart Home.\n\nLast failure reason: {reason}",
                 "title": "Configure account information"
@@ -25,7 +26,8 @@
                 "data": {
                     "username": "Username",
                     "password": "Password",
-                    "default_load_all_entity": "Default load all entity"
+                    "default_load_all_entity": "Default load all entity",
+                    "last_failure_reason": "Last failure reason"
                 },
                 "description": "Experimental legacy password login. If Haier rejects this flow, use Client Id + Refresh Token.\n\nLast failure reason: {reason}",
                 "title": "Configure account information"
@@ -57,7 +59,8 @@
                 "data": {
                     "client_id": "Client Id",
                     "refresh_token": "Refresh Token",
-                    "default_load_all_entity": "Default load all entity"
+                    "default_load_all_entity": "Default load all entity",
+                    "last_failure_reason": "Last failure reason"
                 }
             },
             "account_password": {
@@ -66,7 +69,8 @@
                 "data": {
                     "username": "Username",
                     "password": "Password",
-                    "default_load_all_entity": "Default load all entity"
+                    "default_load_all_entity": "Default load all entity",
+                    "last_failure_reason": "Last failure reason"
                 }
             },
             "device": {
